@@ -43,7 +43,7 @@ namespace TrustedAudioVideoMeeting
     internal class TrustedAudioVideoMeeting
     {
         private static readonly string mediaUrl =
-            "https://raw.githubusercontent.com/OfficeDev/skype-docs/master/Skype/Trusted-Application-API/samples/QuickStartSamples/TrustedAudioVideoMeeting/media/prompt.wav";
+            "https://raw.githubusercontent.com/OfficeDev/skype-docs/master/Skype/Trusted-Application-API/samples/QuickStartSamples/AudioVideoIVRSample/Resources/prompt.wav";
 
         public TrouterBasedEventChannel EventChannel { get; private set; }
 
@@ -117,7 +117,10 @@ namespace TrustedAudioVideoMeeting
             Uri promptUri = new Uri(mediaUrl);
             // Wait for prompt play to complete
             await audioVideoCall.AudioVideoFlow.PlayPromptAsync(promptUri, loggingContext).ConfigureAwait(false);
-            
+            await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+            await audioVideoCall.AudioVideoFlow.StopPromptsAsync();
+            await audioVideoCall.AudioVideoFlow.WaitForAllPromptsToComplete();
+
             // exit after play prompt. wait for 5 seconds to see all responses.
             await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
         }
