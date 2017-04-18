@@ -69,16 +69,22 @@ namespace InviteAndRemoveParticipant
             var meetingConfiguration = new AdhocMeetingCreationInput(Guid.NewGuid().ToString("N") + " test meeting");
 
             // Schedule meeting
-            var adhocMeeting = await applicationEndpoint.Application.CreateAdhocMeetingAsync(loggingContext, meetingConfiguration).ConfigureAwait(false);
+            var adhocMeeting = await applicationEndpoint.Application.CreateAdhocMeetingAsync(meetingConfiguration, loggingContext).ConfigureAwait(false);
 
             WriteToConsoleInColor("ad hoc meeting uri : " + adhocMeeting.OnlineMeetingUri);
             WriteToConsoleInColor("ad hoc meeting join url : " + adhocMeeting.JoinUrl);
 
-            // Get all the events related to join meeting through Trouter's uri
+            // Get all the events related to join meeting through our custom callback uri
             platformSettings.SetCustomizedCallbackurl(callbackUri);
 
             // Start joining the meeting
-            var invitation = await adhocMeeting.JoinAdhocMeeting(loggingContext, null).ConfigureAwait(false);
+            ICommunication communication = applicationEndpoint.Application.Communication;
+            if(!communication.CanJoinAdhocMeeting(adhocMeeting))
+            {
+                throw new Exception("Cannot join the adhoc meeting!");
+            }
+
+            var invitation = await communication.JoinAdhocMeetingAsync(adhocMeeting, null, loggingContext).ConfigureAwait(false);
 
             // Wait for the join to complete
             await invitation.WaitForInviteCompleteAsync().ConfigureAwait(false);
@@ -89,7 +95,7 @@ namespace InviteAndRemoveParticipant
 
             // invite the participant to join the meeting
             WriteToConsoleInColor("Invite " + participantUri + " to join the meeting");
-            var participantInvitation = await invitation.RelatedConversation.AddParticipantAsync(participantUri, loggingContext).ConfigureAwait(false);
+            var participantInvitation = await invitation.RelatedConversation.AddParticipantAsync(new SipUri(participantUri), loggingContext).ConfigureAwait(false);
 
             // Wait for the join to complete
             await participantInvitation.WaitForInviteCompleteAsync().ConfigureAwait(false);

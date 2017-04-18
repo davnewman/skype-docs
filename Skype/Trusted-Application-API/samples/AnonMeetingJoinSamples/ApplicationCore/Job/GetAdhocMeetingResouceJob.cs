@@ -28,7 +28,7 @@ namespace Microsoft.SfB.PlatformService.SDK.Samples.ApplicationCore
 
                 var adhocinput = new AdhocMeetingCreationInput(getAnonTokenInput.Subject);
 
-                var adhocmeetingResources = await AzureApplication.ApplicationEndpoint.Application.CreateAdhocMeetingAsync(loggingContext, adhocinput).ConfigureAwait(false);
+                var adhocmeetingResources = await AzureApplication.ApplicationEndpoint.Application.CreateAdhocMeetingAsync(adhocinput, loggingContext).ConfigureAwait(false);
 
                 if (adhocmeetingResources != null)
                 {

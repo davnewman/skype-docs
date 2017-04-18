@@ -4,6 +4,22 @@ Thank you for your interest in Skype for Business developer documentation!
 
 ## Release Notes
 
+### 1.0.0-prerelease8 (in progress; not yet released)
+
+Key changes:
+ 1. IAudioVideoCall.TransferAsync() has been deprecated and segregated into two methods with same name to clarify their use cases
+
+### 1.0.0-prerelease7
+
+Deprecated interfaces:
+ 1. IApplications is now deprecated. IDiscover has been updated to expose IApplication directly
+
+Deprecated properties:
+ 1. IDiscover.Application deprecates IDiscover.Applications
+
+Dependency changes:
+ 1. System.Net.Http.Formatting.Extension is no longer a dependency
+
 ### 1.0.0-prerelease6
 
 Key changes:
@@ -30,6 +46,8 @@ Key changes:
     11. ICall.TerminateAsync()
     12. IMessagingCall.SendMessageAsync()
     13. IParticipant.EjectAsync()
+
+ 4.  4. AdhocMeetingCreationInput now supports setting leaders
 
 Following methods have newer variation with same name and the previous variation has been deprecated:
  1. IApplication.GetAnonApplicationTokenForMeetingAsync()

@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.SfB.PlatformService.SDK.ClientModel;
+using Microsoft.SfB.PlatformService.SDK.ClientModel.Internal; // Required for setting customized callback url
 using Microsoft.SfB.PlatformService.SDK.Common;
 using QuickSamplesCommon;
 
@@ -58,12 +59,15 @@ namespace P2POutboundIm
             await applicationEndpoint.InitializeAsync(loggingContext).ConfigureAwait(false);
             await applicationEndpoint.InitializeApplicationAsync(loggingContext).ConfigureAwait(false);
 
+            // Get all the events related to join meeting through our custom callback uri
+            platformSettings.SetCustomizedCallbackurl(callbackUri);
+
             WriteToConsoleInColor("Start to send messaging invitation");
             var invitation = await applicationEndpoint.Application.Communication.StartMessagingAsync(
-                subject: "Subject",
-                to: targetUserId,
-                callbackUrl: callbackUri.ToString(),
-                loggingContext: loggingContext).ConfigureAwait(false);
+                "Subject",
+                new SipUri(targetUserId),
+                null,
+                loggingContext).ConfigureAwait(false);
 
             // Wait for user to accept the invitation
             var conversation = await invitation.WaitForInviteCompleteAsync().ConfigureAwait(false);
@@ -75,7 +79,7 @@ namespace P2POutboundIm
             await conversation.MessagingCall.SendMessageAsync("Hello World!", loggingContext).ConfigureAwait(false);
 
             WriteToConsoleInColor("Staying in the conversation for 5 minutes");
-            
+
             // Wait 5 minutes before exiting
             // Since we registered callbacks, we will continue to show message logs
             await Task.Delay(TimeSpan.FromMinutes(5)).ConfigureAwait(false);

@@ -8,9 +8,9 @@ using QuickSamplesCommon;
 
 namespace MessagingAfterJoinMeeting
 {
-    class Program
+    public static class Program
     {
-        static void Main(string[] args)
+        public static void Main()
         {
             var sample = new MessagingAfterJoinMeeting();
             try
@@ -66,16 +66,22 @@ namespace MessagingAfterJoinMeeting
             var meetingConfiguration = new AdhocMeetingCreationInput(Guid.NewGuid().ToString("N") + " test meeting");
 
             // Schedule meeting
-            var adhocMeeting = await applicationEndpoint.Application.CreateAdhocMeetingAsync(loggingContext, meetingConfiguration).ConfigureAwait(false);
+            var adhocMeeting = await applicationEndpoint.Application.CreateAdhocMeetingAsync(meetingConfiguration, loggingContext).ConfigureAwait(false);
 
             WriteToConsoleInColor("ad hoc meeting uri : " + adhocMeeting.OnlineMeetingUri);
             WriteToConsoleInColor("ad hoc meeting join url : " + adhocMeeting.JoinUrl);
 
-            // Get all the events related to join meeting through Trouter's uri
+            // Get all the events related to join meeting through our custom callback uri
             platformSettings.SetCustomizedCallbackurl(callbackUri);
 
             // Start joining the meeting
-            var invitation = await adhocMeeting.JoinAdhocMeeting(loggingContext, null).ConfigureAwait(false);
+            ICommunication communication = applicationEndpoint.Application.Communication;
+            if(!communication.CanJoinAdhocMeeting(adhocMeeting))
+            {
+                throw new Exception("Cannot join adhoc meeting");
+            }
+
+            var invitation = await communication.JoinAdhocMeetingAsync(adhocMeeting, null, loggingContext).ConfigureAwait(false);
 
             // Wait for the join to complete
             await invitation.WaitForInviteCompleteAsync().ConfigureAwait(false);

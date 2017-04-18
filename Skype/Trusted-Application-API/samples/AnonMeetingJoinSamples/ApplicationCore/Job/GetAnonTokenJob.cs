@@ -25,10 +25,10 @@ namespace Microsoft.SfB.PlatformService.SDK.Samples.ApplicationCore
                 }
 
                 var tokenResources = await AzureApplication.ApplicationEndpoint.Application.GetAnonApplicationTokenForMeetingAsync(
-                    LoggingContext,
                     getAnonTokenInput.MeetingUrl,
                     getAnonTokenInput.AllowedOrigins,
-                    getAnonTokenInput.ApplicationSessionId).ConfigureAwait(false);
+                    getAnonTokenInput.ApplicationSessionId,
+                    LoggingContext).ConfigureAwait(false);
 
                 if (tokenResources != null)
                 {
