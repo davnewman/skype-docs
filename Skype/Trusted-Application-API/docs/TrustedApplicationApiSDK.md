@@ -1,12 +1,12 @@
-# Trusted Application API - SDK
+# Trusted Application SDK
 
-This article will act as an introduction to the Trusted Application API SDK that can be used to communicate with **Skype for Business - Platform Service** (called platform service from here on)
+This article will act as an introduction to the Trusted Application SDK that can be used to communicate with the **Skype for Business Trusted Application API**
 
-The quick start samples can be used to learn more about the code beyond that is mentioned here.
+Refer to the quick start Trusted Application API code samples to learn more about the usage of the SDK.
 
 ## Installation
 
-The Trusted Application API SDK (called sdk from here on) is available as a prerelease in nuget.org. It can be installed in your project with the following command.
+The Trusted Application SDK is available as a prerelease package on nuget.org. It can be installed in your project with the following command:
 
 ```
 Install-Package Microsoft.SkypeforBusiness.TrustedApplicationAPI.SDK -Pre
@@ -16,11 +16,11 @@ Note that the solution must target **.NET Framework 4.6.2 or higher** for the SD
 
 ## Application Registration
 
-Any application that communicates with Platform Service must be registered in [Registration Portal](https://aka.ms/skypeappregistration). You must note the AAD Client ID and AAD Client Secret as received in the portal.
+Any application that communicates with the Trusted Application API must be registered in [Registration Portal](https://aka.ms/skypeappregistration). You must note the AAD App ID and AAD Client Secret as received in the portal.
 
 ## First Steps
 
-To use the SDK, you require to first create a `ClientPlatformSettings` Object which holds the settings and an implementation of `IPlatformServiceLogger` class which provides logging. 
+To use the SDK, you are required to first create a `ClientPlatformSettings` Object which holds the settings and an implementation of `IPlatformServiceLogger` class which provides logging. 
 
 ```
 var platformSettings = new ClientPlatformSettings(AAD_ClientSecret, Guid.Parse(AAD_ClientId));
@@ -29,44 +29,44 @@ var platformSettings = new ClientPlatformSettings(AAD_ClientSecret, Guid.Parse(A
 var logger = new PlatformServiceLogger();
 ```
 
-The AAD client id and secret are those values received from the registration portal. Now create the Client Platform object.
+The AAD App ID and secret are those values received from the registration portal. Now create the Client Platform object.
 
 ```
 var platform = new ClientPlatform(platformSettings, logger);
 ```
 
-In order to use platform service, you need to create a event channel that implements the `IEventChannel` interface. For the next part, `EventChannel` is a class that implements that interface. We create an instance for the event channel.
+In order to use the Trusted Application API, you need to create a event channel that implements the `IEventChannel` interface. For the next part, `EventChannel` is a class that implements that interface. We create an instance for the event channel.
 
 ```
 IEventChannel eventChannel = new EventChannel();
 ```
 
-We need to create an application endpoint for the use with platform service. First, we create the endpoint settings object
+We need to create an Application Endpoint for the use with the Trusted Application API. First, we create the endpoint settings object
 
 ```
 var endpointSettings = new ApplicationEndpointSettings(new SipUri("sip:example@contoso.com"));
 ```
 
-The sip uri is the uri that is associated with the application endpoint. Then, we create the endpoint
+The SIP URI is the URI that is associated with the application endpoint. Then, we create the endpoint
 
 ```
 var applicationEndpoint = new ApplicationEndpoint(platform, endpointSettings, eventChannel);
 ```
 
-We now initialize the application and the endpoint to start communication with platform service.
+We now initialize the application and the endpoint to start communication with the Trusted Application API.
 
 ```
 await applicationEndpoint.InitializeAsync().ConfigureAwait(false);
 await applicationEndpoint.InitializeApplicationAsync().ConfigureAwait(false);
 ```
 
-The application and the endpoint are now initialized and could be used for any communication that is required.
+The application and the endpoint are now initialized and can be used for any communication that is required.
 
 ## Check if a feature is available or not
 
 All `IPlatformResource` objects will have a *Supports* method which can be used to check if the application has links available for the operation.
 
-For example, to check if the application can start an `AudioVideo` call, developer can do this
+For example, to check if the application can start an `AudioVideo` call, a developer can do this
 
 ```
 var communication = applicationEndpoint.Application.Communication;
@@ -138,6 +138,6 @@ async void On_AudioVideoCall_Received(object sender, IncomingInviteEventArgs<IAu
 
 ## Exceptions
 
-- A `PlatformServiceClientInvalidOperationException` is thrown when an invalid operation within platform service is executed.
+- A `PlatformServiceClientInvalidOperationException` is thrown when an invalid operation within the Trusted Application API is executed.
 
 - A `CapabilityNotAvailableException` is thrown when a capability is used while unavailable.
