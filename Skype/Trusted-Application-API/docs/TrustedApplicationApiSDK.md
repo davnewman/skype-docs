@@ -62,6 +62,23 @@ await applicationEndpoint.InitializeApplicationAsync().ConfigureAwait(false);
 
 The application and the endpoint are now initialized and could be used for any communication that is required.
 
+## Check if a feature is available or not
+
+All `IPlatformResource` objects will have a *Supports* method which can be used to check if the application has links available for the operation.
+
+For example, to check if the application can start an `AudioVideo` call, developer can do this
+
+```
+var communication = applicationEndpoint.Application.Communication;
+
+if (!communication.Supports(CommunicationCapability.StartAudioVideo))
+{
+    return;
+}
+```
+
+If the app ends up calling the API, we throw `CapabilityNotAvailableException`.
+
 ## Examples
 
 ### Create AdHocMeeting
@@ -80,7 +97,7 @@ To send a P2P message to `sip:target@contoso.com`, we first create an invitation
 ```
 var invitation = await applicationEndpoint.Application.Communication.StartMessagingAsync(
                             subject: "Subject",
-                            to: "sip:target@contoso.com",
+                            to: new SipUri("sip:target@contoso.com"),
                             callbackUrl: callbackUri.ToString(),
                             loggingContext: loggingContext).ConfigureAwait(false);
 
@@ -102,3 +119,25 @@ conversation.MessagingCall.IncomingMessageReceived += (sender, args) => {
     // Do something with the message.
 }
 ```
+
+### Listen for incoming calls
+
+You can listen to new incoming calls by registering a callback on the endpoint.
+
+```
+applicationEndpoint.HandleIncomingAudioVideoCall += On_AudioVideoCall_Received;
+
+async void On_AudioVideoCall_Received(object sender, IncomingInviteEventArgs<IAudioVideoInvitation> e) 
+{
+    await e.NewInvite.AcceptAsync().ConfigureAwait(false);
+    var conversation = e.NewInvite.RelatedConversation;
+
+    // Do something with the conversation
+}
+```
+
+## Exceptions
+
+- A `PlatformServiceClientInvalidOperationException` is thrown when an invalid operation within platform service is executed.
+
+- A `CapabilityNotAvailableException` is thrown when a capability is used while unavailable.
